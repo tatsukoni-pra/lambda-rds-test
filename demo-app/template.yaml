@@ -1,9 +1,20 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
+Parameters:
+  SecurityGroupIds:
+    Type: CommaDelimitedList
+    Default: ''
+  SubnetIDs:
+    Type: CommaDelimitedList
+    Default: ''
+
 Globals:
   Function:
     Timeout: 15
+    VpcConfig:
+      SecurityGroupIds: !Ref SecurityGroupIds
+      SubnetIds: !Ref SubnetIDs
 
 Resources:
   RDSDemoFunction:
@@ -14,7 +25,7 @@ Resources:
         - x86_64
       Policies:
         - SSMParameterReadPolicy:
-            ParameterName: !Sub /lambda/*
+            ParameterName: !Sub lambda/*
       Environment:
         Variables:
           ENV_TEST: test
