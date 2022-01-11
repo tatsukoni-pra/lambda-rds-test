@@ -1,9 +1,8 @@
 package main
 
 import (
+	"app/dataStore"
 	"context"
-
-	dataStore "app/dataStore"
 
 	"github.com/aws/aws-lambda-go/lambda"
 )

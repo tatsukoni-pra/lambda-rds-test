@@ -12,15 +12,17 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-const recordStatus int = 1
+const recordStatus int = 3
 
 type DBConnectionInfo struct {
-	UserName string
-	Password string
-	Host     string
-	Database string
-	Port     string
-	Charset  string
+	UserName  string
+	Password  string
+	Host      string
+	Database  string
+	Port      string
+	Charset   string
+	ParseTime string
+	Loc       string
 }
 
 /*
@@ -54,13 +56,15 @@ func UpdateDBData() {
 func dbConnect() (*sql.DB, error) {
 	connectInfo := getDBConnectionInfo()
 	connectStr := fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?charset=%s",
+		"%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=%s&loc=%s",
 		connectInfo.UserName,
 		connectInfo.Password,
 		connectInfo.Host,
 		connectInfo.Port,
 		connectInfo.Database,
 		connectInfo.Charset,
+		connectInfo.ParseTime,
+		connectInfo.Loc,
 	)
 	db, err := sql.Open("mysql", connectStr)
 	if err != nil {
@@ -71,12 +75,14 @@ func dbConnect() (*sql.DB, error) {
 
 func getDBConnectionInfo() *DBConnectionInfo {
 	return &DBConnectionInfo{
-		UserName: getDBSecretValueFromSSM("/lambda/DB_USERNAME"),
-		Password: getDBSecretValueFromSSM("/lambda/DB_PASSWORD"),
-		Host:     getDBSecretValueFromSSM("/lambda/DB_HOST"),
-		Database: getDBSecretValueFromSSM("/lambda/DB_DATABASE"),
-		Port:     "3306",
-		Charset:  "utf8"}
+		UserName:  getDBSecretValueFromSSM("/lambda/DB_USERNAME"),
+		Password:  getDBSecretValueFromSSM("/lambda/DB_PASSWORD"),
+		Host:      getDBSecretValueFromSSM("/lambda/DB_HOST"),
+		Database:  getDBSecretValueFromSSM("/lambda/DB_DATABASE"),
+		Port:      "3306",
+		Charset:   "utf8",
+		ParseTime: "true",
+		Loc:       "Asia%2FTokyo"}
 }
 
 func getDBSecretValueFromSSM(key string) string {

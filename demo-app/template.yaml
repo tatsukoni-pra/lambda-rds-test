@@ -26,13 +26,33 @@ Resources:
       Policies:
         - SSMParameterReadPolicy:
             ParameterName: !Sub lambda/*
+        - SQSSendMessagePolicy:
+            QueueName: !Sub lambda-rds-demo-sqs-v1
       Environment:
         Variables:
           ENV_TEST: test
+      Events:
+        CreateThumbnailEvent:
+          Type: S3
+          Properties:
+            Bucket: !Ref SrcBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                - Name: prefix
+                  Value: tmp
+      DeadLetterQueue:
+        Type: SQS
+        TargetArn: arn:aws:sqs:ap-northeast-1:083636136646:lambda-rds-demo-sqs-v1
     Metadata:
       DockerTag: latest
       DockerContext: .
       Dockerfile: Dockerfile
+  SrcBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: "tatsukoni-lambda-rds-demo-upload"
 
 Outputs:
   ResizeFunction:
